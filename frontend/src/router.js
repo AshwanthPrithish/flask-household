@@ -23,6 +23,7 @@ import store from './store';
 import SectionsPage from './components/SectionsPage.vue';
 import SectionPage from './components/SectionPage.vue';
 import UpdateSection from './components/UpdateSection.vue';
+import SearchResultsTitle from './components/SearchResultsTitle.vue';
 
 
 Vue.use(Router);
@@ -43,6 +44,12 @@ const routes = [
     path: '/search-results-section/:data',
     name: 'SearchResultsSection',
     component: SearchResultsSection,
+    props: true
+  },
+  {
+    path: '/search-results-title/:data',
+    name: 'SearchResultsTitle',
+    component: SearchResultsTitle,
     props: true
   },
   {

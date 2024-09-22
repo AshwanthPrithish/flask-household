@@ -258,6 +258,18 @@ def search_results_section():
    return jsonify(sections=sections, success=True), 200
 
 
+@app.route("/search-results-title", methods=["GET", "POST"])
+@login_required
+def search_results_title(query):
+   data = request.get_json()
+   query = data['title']
+   books = Book.query.filter(func.lower(Book.title).ilike(f"%{query.lower()}%")).all()
+   books = [[{'id':book.id,'title':book.title, 'release_year':book.release_year,'content': book.content ,'librarian_username':Librarian.query.filter_by(id=book.librarian_id).first().username}] for book in books]
+   if len(books) <= 0:
+      return jsonify(message=f'No books found for the query {query}!', success=True),200
+   return jsonify(books=books, success=True), 200
+
+
 @app.route("/section", methods=["GET","POST"])
 @login_required
 def section():
@@ -345,23 +357,6 @@ def update_section():
 
 
 
-
-
-
-@app.route("/search-results-title/<query>")
-@login_required
-def search_results_title(query):
-   titles = Book.query.filter(func.lower(Book.title).ilike(f"%{query.lower()}%")).all()
-   books = [[{'title':book.title, 'author':book.author,'lang': book.lang ,'content':book.content, 'rating':book.rating, 'release_year':book.release_year,'id':book.id},book.genre_id, Genre.query.filter_by(id=book.genre_id).first().name] for book in titles]
-   if current_user.role == 'student':
-           for book in books:
-              if len(BookIssue.query.filter_by(student_id=current_user.id, book_id=book[0].get('id')).all()) <= 0:
-                 del book[0]['content']
-   books.sort(key = lambda x: x[0].get('rating'), reverse=True)
-   if len(books) <= 0:
-      flash(f'No books found for the query {query}!', 'danger')
-      return redirect(url_for('student_dash'))
-   return render_template('search_results_title.html', titles=books, title='Search by book title')
 
 
 @app.route("/sp-dash", methods=['GET', 'POST'])
